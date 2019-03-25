@@ -1,5 +1,3 @@
-import glob
-import subprocess
 import time
 from bottle import route, run, template
 
@@ -35,7 +33,7 @@ def ac_toggle(switch=0):
 
         # Switch it on for x minutes
     elif int(switch) > 1:
-        p = subprocess.Popen(['/home/pi/pistat/timer.py', switch]);
+		ac.run_timer(switch)
         return msg_tmpl("switching on for " + switch + " minutes", 85)
 
 @route('/temp')

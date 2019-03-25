@@ -20,3 +20,6 @@ def send(command=ACCommand.OFF):
 
 	# Use irsend to blast the correct sequence to the AC
 	return subprocess.call(["irsend", "SEND_ONCE", "mitsubishi", label])
+	
+def run_timer(minutes):
+	subprocess.Popen(['/home/pi/pistat/timer.py', minutes])
