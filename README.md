@@ -19,6 +19,6 @@ The system is used as follows:
 - Go to \<pi url\>:8765/temp to get the current temperature.
 - Go to \<pi url\>:8765/ac/1 to switch AC on.
 - Go to \<pi url\>:8765/ac/0 to switch AC off.
-- Go to \<pi url\>:8765/ac/<x> to switch AC on for x minutes.
+- Go to \<pi url\>:8765/ac/\<x\> to switch AC on for x minutes.
 
 For access on public networks, forward desired public port to 8765 on the pi.
