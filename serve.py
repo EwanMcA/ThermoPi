@@ -1,58 +1,46 @@
-import os
 import glob
 import subprocess
 import time
 from bottle import route, run, template
 
-def read_temp_raw(fn):
-    f = open(fn, 'r')
-    lines = f.readlines()
-    f.close()
-    return lines
+import ac
+import temp
 
-def read_temp(f):
-    lines = read_temp_raw(f)
-    while lines[0].strip()[-3:] != 'YES':
-        time.sleep(0.2)
-        lines = read_temp_raw(f)
-    equals_pos = lines[1].find('t=')
-    if equals_pos != -1:
-        temp_string = lines[1][equals_pos+2:]
-        temp_c = float(temp_string) / 1000.0
-        return temp_c
+# Syntactic sugar for simple HTML response
+def msg_tmpl(message, fntSize):
+	return '''<h1 style="text-align: center; padding-top: 40%; font-size: {0}px;">
+				{1}
+			  </h1>'''.format(fntSize, message)
 
+# Don't want the root to return anything at the moment
 @route('/')
 def index():
     return 'Go Away.'
 
+# The route is used to delineate AC commands
 @route('/ac/:switch')
 def ac(switch=0):
+
+	# Switch it off
     if switch == '0':
-        rtn = subprocess.call(["irsend", "SEND_ONCE", "mitsubishi", "OFF"])
-        # rtn should equal 0 if command ran without error
-        return '<h1 style="text-align: center; padding-top: 40%; font-size: 100px;">switching off</h1>'
+        ac.ac_command(ACCommand.OFF)
+        return msg_tmpl("switching off", 100)
 
+	# Switch it on and set to max fan
     elif switch == '1':
-        rtn = subprocess.call(["irsend", "SEND_ONCE", "mitsubishi", "ON"])
-        # rtn should equal 0 if command ran without error
+        ac.ac_command(ACCommand.ON)
         time.sleep(2)
-        rtn = subprocess.call(["irsend", "SEND_ONCE", "mitsubishi", "FAN"])
-        # rtn should equal 0 if command ran without error
-        return '<h1 style="text-align: center; padding-top: 40%; font-size: 100px;">switching on</h1>'
+		ac.ac_command(ACCommand.FAN)
+        return msg_tmpl("switching on", 100)
 
+	# Switch it on for x minutes
     elif int(switch) > 1:
         p = subprocess.Popen(['/home/pi/pistat/timer.py', switch]);
-        return '<h1 style="text-align: center; padding-top: 40%; font-size: 85px;">switching on for ' + switch + ' minutes</h1>'
+        return msg_tmpl("switching on for " + switch + " minutes", 85)
 
 @route('/temp')
 def temp():
-    os.system('modprobe w1-gpio')
-    os.system('modprobe w1-therm')
-
-    base_dir = '/sys/bus/w1/devices/'
-    device_folder = glob.glob(base_dir + '28*')[0]
-    device_file = device_folder + '/w1_slave'
-
-    return '<h1 style="text-align: center; padding-top: 40%; font-size: 100px;">temp is ' + str(read_temp(device_file)) + '</h1>'
+	# Return the current temperature
+    return msg_tmpl('temp is ' + str(temp.read_temp(temp.setup())) + 'C', 100)
 
 run(host='0.0.0.0', port=8765, server="meinheld")
