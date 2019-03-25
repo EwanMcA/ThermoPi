@@ -21,17 +21,17 @@ def read_temp_raw(fn):
 
 # Read data and return parsed temperature
 def read_temp(f):
-	# Read raw temperature data (including boilerplate junk)
+    # Read raw temperature data (including boilerplate junk)
     lines = read_temp_raw(f)
-	
-	# Loop until temp is available
+
+    # Loop until temp is available
     while lines[0].strip()[-3:] != 'YES':
         time.sleep(0.2)
         lines = read_temp_raw(f)
 
     # Strip out junk and return temperature
-	equals_pos = lines[1].find('t=')
-	if equals_pos != -1:
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
         temp_string = lines[1][equals_pos+2:]
         temp_c = float(temp_string) / 1000.0
         return temp_c

@@ -7,16 +7,16 @@ class ACCommand(Enum):
 	OFF = 1
 	ON = 2
 	FAN = 3
-	
+
 # Send an instruction with irsend (using labels which are stored in LIRC config)
-def ac_command(command=ACCommand.OFF):
-	
+def send(command=ACCommand.OFF):
+
 	if command == ACCommand.OFF:
-		label = "OFF"
+			label = "OFF"
 	elif command == ACCommand.ON:
-		label = "ON"
+			label = "ON"
 	elif command == ACCommand.FAN:
-		label = "FAN"
-	
+			label = "FAN"
+
 	# Use irsend to blast the correct sequence to the AC
 	return subprocess.call(["irsend", "SEND_ONCE", "mitsubishi", label])
